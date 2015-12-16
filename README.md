@@ -18,7 +18,7 @@ You will need [Leiningen][1] 2.0 or above installed.
 
     lein run
     
-#### start figwheel
+#### start Figwheel
 
     lein figwheel
 
