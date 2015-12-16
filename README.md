@@ -1,6 +1,6 @@
 # picture-gallery
 
-FIXME
+sample Reagent project
 
 ## Prerequisites
 
@@ -10,10 +10,18 @@ You will need [Leiningen][1] 2.0 or above installed.
 
 ## Running
 
-To start a web server for the application, run:
+### run migrations
+
+    lein run migrate
+
+### start the web server
 
     lein run
+    
+#### start figwheel
+
+    lein figwheel
 
 ## License
 
-Copyright © 2015 FIXME
+Copyright © 2015 Dmitri Sotnikov
