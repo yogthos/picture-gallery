@@ -1,8 +1,8 @@
 (ns picture-gallery.config
-  (:require [taoensso.timbre :as timbre]))
+  (:require [clojure.tools.logging :as log]))
 
 (def defaults
   {:init
    (fn []
-     (timbre/info "\n-=[picture-gallery started successfully]=-"))
+     (log/info "\n-=[picture-gallery started successfully]=-"))
    :middleware identity})

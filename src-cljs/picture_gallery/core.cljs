@@ -1,73 +1,81 @@
 (ns picture-gallery.core
-  (:require [reagent.core :as reagent :refer [atom]]
+  (:require [reagent.core :as r]
             [reagent.session :as session]
             [secretary.core :as secretary :include-macros true]
             [goog.events :as events]
             [goog.history.EventType :as EventType]
             [markdown.core :refer [md->html]]
             [picture-gallery.ajax :as ajax]
-            [picture-gallery.components.registration :as r]
+            [picture-gallery.components.registration :as reg]
             [picture-gallery.components.login :as l]
             [picture-gallery.components.upload :as u]
             [picture-gallery.components.gallery :as g])
   (:import goog.History))
 
+(defn nav-link [uri title page collapsed?]
+  [:ul.nav.navbar-nav>a.navbar-brand
+   {:class (when (= page (session/get :page)) "active")
+    :href uri
+    :on-click #(reset! collapsed? true)}
+   title])
+
 ;START:account-actions
 (defn account-actions [id]
-  (let [expanded? (atom false)]
+  (let [expanded? (r/atom false)]
     (fn []
-      [:li.dropdown
+      [:div.dropdown
        {:class    (when @expanded? "open")
         :on-click #(swap! expanded? not)}
-       [:a.dropdown-toggle
-        [:span.glyphicon.glyphicon-user] " " id [:span.caret]
-        [:ul.dropdown-menu
-         [:li>a
-          {:on-click
+       [:button.btn.btn-secondary.dropdown-toggle
+        {:type :button}
+        [:span.glyphicon.glyphicon-user] " " id [:span.caret]]
+       [:div.dropdown-menu.user-actions
+        [:a.dropdown-item.btn
+        {:on-click
            #(session/put!
-             :modal r/delete-account-modal)}
+             :modal reg/delete-account-modal)}
           "delete account"]
-         [:li>a
-          {:on-click
+        [:a.dropdown-item.btn
+        {:on-click
            #(ajax/POST
              "/logout"
              {:handler (fn [] (session/remove! :identity))})}
-          "sign out"]]]])))
+          "sign out"]]])))
 ;END:account-actions
 
 ;START:user-menu
 (defn user-menu []
   (if-let [id (session/get :identity)]
-    [:li
-     [:ul.nav.navbar-nav
-      [:li
+    [:ul.nav.navbar-nav.pull-xs-right
+      [:li.nav-item
        [u/upload-button]]
-      [account-actions id]]]
-    [:li
-     [:ul.nav.navbar-nav
-      [:li [l/login-button]]
-      [:li [r/registration-button]]]]))
+      [:li.nav-item
+       [account-actions id]]]
+    [:ul.nav.navbar-nav.pull-xs-right
+      [:li.nav-item [l/login-button]]
+      [:li.nav-item [reg/registration-button]]]))
 ;END:user-menu
 
 (defn navbar []
-  [:div.navbar.navbar-inverse.navbar-fixed-top
-   [:div.container
-    [:div.navbar-header>a.navbar-brand {:href "#/"} "myapp"]
-    [:div.navbar-collapse.collapse
-     [:ul.nav.navbar-nav
-      [:li {:class (when (= :home (session/get :page)) "active")}
-       [:a {:href "#/"} "Home"]]
-      [:li {:class (when (= :about (session/get :page)) "active")}
-       [:a {:href "#/about"} "About"]]]
-     [:ul.nav.navbar-nav.navbar-right
-      [user-menu]]]]])
+  (let [collapsed? (r/atom true)]
+    (fn []
+      [:nav.navbar.navbar-light.bg-faded
+       [:button.navbar-toggler.hidden-sm-up
+        {:on-click #(swap! collapsed? not)} "☰"]
+       [:div.collapse.navbar-toggleable-xs
+        (when-not @collapsed? {:class "in"})
+        [:a.navbar-brand {:href "#/"} "picture-gallery"]
+        [:ul.nav.navbar-nav
+         [nav-link "#/" "Home" :home collapsed?]
+         [nav-link "#/about" "About" :about collapsed?]]]
+       [user-menu]])))
 
 (defn about-page []
   [:div "this is the story of picture-gallery... work in progress"])
 
 ;START:galleries
 (defn galleries [gallery-links]
-  [:div.text-center
+  [:div.text-xs-center
    (for [row (partition-all 3 gallery-links)]
      ^{:key row}
      [:div.row
@@ -136,8 +144,8 @@
 ;; -------------------------
 ;; Initialize app
 (defn mount-components []
-  (reagent/render [#'navbar] (.getElementById js/document "navbar"))
-  (reagent/render [#'page] (.getElementById js/document "app")))
+  (r/render [#'navbar] (.getElementById js/document "navbar"))
+  (r/render [#'page] (.getElementById js/document "app")))
 
 (defn init! []
   (hook-browser-navigation!)

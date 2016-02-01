@@ -3,14 +3,13 @@
             [picture-gallery.validation :refer [registration-errors]]
             [ring.util.http-response :as response]
             [buddy.hashers :as hashers]
-            [taoensso.timbre :as timbre])
-  (:import java.nio.charset.Charset))
+            [clojure.tools.logging :as log]))
 
 ;START:login
 (defn decode-auth [encoded]
   (let [auth (second (.split encoded " "))]
     (-> (.decode (java.util.Base64/getDecoder) auth)
-        (String. (Charset/forName "UTF-8"))
+        (String. (java.nio.charset.Charset/forName "UTF-8"))
         (.split ":"))))
 
 (defn authenticate [[id pass]]
@@ -40,7 +39,7 @@
       {:result  :error
        :message "user with the selected ID already exists"})
     (do
-      (timbre/error e)
+      (log/error e)
       (response/internal-server-error
         {:result  :error
          :message "server error occurred while adding the user"}))))

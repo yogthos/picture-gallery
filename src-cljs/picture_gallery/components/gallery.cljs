@@ -1,50 +1,19 @@
 ;START:ns
 (ns picture-gallery.components.gallery
   (:require [picture-gallery.components.common :as c]
-            [reagent.core :as reagent :refer [atom]]
+            [reagent.core :refer [atom]]
             [reagent.session :as session]
             [picture-gallery.ajax :as ajax]
             [clojure.string :as s]))
 ;END:ns
 
-;START:set-background
-(defn rgb-str [[r g b] mask]
-  (str "rgba(" r "," g "," b "," mask ")"))
-
-(defn set-background! [style [c1 c2 c3]]
-  (set! (.-background style)
-        (str "linear-gradient("
-             (rgb-str c3 0.8) ","
-             (rgb-str c2 0.9) ","
-             (rgb-str c1 1) ")")))
-;END:set-background
-
-;START:image-panel
-(defn image-panel-did-mount [thumb-link]
-  (fn [div]
-    (.getColors
-      (js/AlbumColors. thumb-link)
-      (fn [colors]
-        (-> div reagent/dom-node .-style (set-background! colors))))))
-
-(defn render-image-panel [link]
-  (fn []
-    [:img.image.panel.panel-default
-     {:on-click #(session/remove! :modal)
-      :src link}]))
-
-(defn image-panel [thumb-link link]
-  (reagent/create-class {:render      (render-image-panel link)
-                         :component-did-mount (image-panel-did-mount thumb-link)}))
-;END:image-panel
-
-;START:image-modal
-(defn image-modal [thumb-link link]
+(defn image-modal [link]
   (fn []
     [:div
-     [image-panel thumb-link link]
+     [:img.image.panel.panel-default
+      {:on-click #(session/remove! :modal)
+       :src link}]
      [:div.modal-backdrop.fade.in]]))
-;END:image-modal
 
 ;START:delete-image
 (defn delete-image! [name]
@@ -80,30 +49,27 @@
 
 ;START:thumb-link
 (defn thumb-link [{:keys [owner name]}]
-  [:td
+  [:div.col-sm-4
    [:img
     {:src      (str js/context "/gallery/" owner "/" name)
      :on-click #(session/put!
                  :modal
-                 (image-modal
-                   (str js/context "/gallery/" owner "/" name)
-                   (str js/context "/gallery/" owner "/" (s/replace name #"thumb_" ""))))}]
+                 (image-modal (str js/context "/gallery/" owner "/" (s/replace name #"thumb_" ""))))}]
    (when (= (session/get :identity) owner)
-     [:button.btn.btn-danger
+     [:div.text-xs-center>div.btn.btn-danger
       {:on-click #(delete-image-button owner name)}
-      [:span.glyphicon.glyphicon-remove]])])
+      [:i.fa.fa-times]])])
 ;END:thumb-link
 
 ;START:gallery
 (defn gallery [links]
-  [:table
-   [:tbody
-    (for [row (partition-all 3 links)]
-      ^{:key row}
-      [:tr
-       (for [link row]
-         ^{:key link}
-         [thumb-link link])])]])
+  [:div.text-xs-center
+   (for [row (partition-all 3 links)]
+     ^{:key row}
+     [:div.row
+      (for [link row]
+        ^{:key link}
+        [thumb-link link])])])
 ;END:gallery
 
 ;START:pager-helpers
@@ -114,8 +80,9 @@
   (if (pos? i) (dec i) i))
 
 (defn nav-link [page i]
-  [:li {:on-click #(reset! page i)
-        :class    (when (= i @page) "active")}
+  [:li.page-item>a.page-link.btn.btn-primary
+   {:on-click #(reset! page i)
+    :class    (when (= i @page) "active")}
    [:span i]])
 ;END:pager-helpers
 
@@ -123,14 +90,14 @@
 (defn pager [pages page]
   (when (> pages 1)
     (into
-      [:div.row.text-center>div.col-sm-12>ul.pagination.pagination-lg]
+      [:div.text-xs-center>ul.pagination.pagination-lg]
       (concat
-        [[:li
+        [[:li.page-item>a.page-link.btn.btn-primary
           {:on-click #(swap! page back pages)
            :class    (when (= @page 0) "disabled")}
           [:span "«"]]]
         (map (partial nav-link page) (range pages))
-        [[:li
+        [[:li.page-item>a.page-link.btn.btn-primary
           {:on-click #(swap! page forward pages)
            :class    (when (= @page (dec pages)) "disabled")}
           [:span "»"]]]))))
@@ -154,8 +121,7 @@
     (fn []
       [:div.container
        (when-let [thumbnail-links (partition-links (session/get :thumbnail-links))]
-         [:div.row
-          [:div.col-md-12
-           [pager (count thumbnail-links) page]
-           [gallery (thumbnail-links @page)]]])])))
+         [:div.row>div.col-md-12
+          [pager (count thumbnail-links) page]
+          [gallery (thumbnail-links @page)]])])))
 ;END:gallery-page

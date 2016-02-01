@@ -44,6 +44,6 @@
          "Cancel"]]])))
 
 (defn upload-button []
-  [:a
+  [:a.btn
    {:on-click #(session/put! :modal upload-form)}
    "upload image"])

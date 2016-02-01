@@ -1,7 +1,7 @@
 (ns picture-gallery.routes.services.upload
   (:require [picture-gallery.db.core :as db]
             [ring.util.http-response :refer :all]
-            [taoensso.timbre :as timbre])
+            [clojure.tools.logging :as log])
   (:import [java.awt.image AffineTransformOp BufferedImage]
            [java.io ByteArrayOutputStream FileInputStream]
            java.awt.geom.AffineTransform
@@ -59,6 +59,5 @@
                       :name  (str thumb-prefix db-file-name)}))
     (ok {:result :ok})
     (catch Exception e
-      (timbre/error e)
+      (log/error e)
       (internal-server-error "error"))))
-

@@ -41,7 +41,7 @@
      [:div.input-group
       [input type id placeholder fields]
       [:span.input-group-addon
-       [:span.glyphicon.glyphicon-asterisk]]])])
+       "✱"]])])
 
 (defn text-input [label id placeholder fields & [optional?]]
   (form-input :text label id placeholder fields optional?))

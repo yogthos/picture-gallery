@@ -39,8 +39,7 @@
        [:div "Picture Gallery Login"]
        [:div
         [:div.well.well-sm
-         [:strong [:span.glyphicon.glyphicon-asterisk]
-          "required field"]]
+         [:strong "✱ required field"]]
         [c/text-input "name" :id "enter a user name" fields]
         [c/password-input "password" :pass "enter a password" fields]
         (when-let [error @error]
@@ -54,7 +53,7 @@
          "Cancel"]]])))
 
 (defn login-button []
-  [:a
+  [:a.btn
    {:on-click #(session/put! :modal login-form)}
    "login"])
 

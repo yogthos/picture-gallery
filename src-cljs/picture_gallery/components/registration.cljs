@@ -21,7 +21,9 @@
 ;START:delete-account
 (defn delete-account! []
   (ajax/POST "/delete-account"
-             {:handler #(session/remove! :identity)}))
+             {:handler #(do
+                          (session/remove! :identity)
+                          (session/put! :page :home))}))
 ;END:delete-account
 
 ;START:delete-account-modal
@@ -46,11 +48,10 @@
         error  (atom nil)]
     (fn []
       [c/modal
-       [:div "Picture Gallery Registeration"]
+       [:div "Picture Gallery Registration"]
        [:div
         [:div.well.well-sm
-         [:strong [:span.glyphicon.glyphicon-asterisk]
-          "required field"]]
+         [:strong "✱ required field"]]
         [c/text-input "name" :id "enter a user name" fields]
         (when-let [error (first (:id @error))]
           [:div.alert.alert-danger error])
@@ -69,6 +70,6 @@
          "Cancel"]]])))
 
 (defn registration-button []
-  [:a
+  [:a.btn
    {:on-click #(session/put! :modal registration-form)}
    "register"])

@@ -10,10 +10,13 @@
                  [ring-middleware-format "0.7.0"]
                  [metosin/ring-http-response "0.6.5"]
                  [bouncer "0.3.3"]
-                 [org.clojure/tools.nrepl "0.2.12"]
-                 [org.webjars/bootstrap "3.3.6"]
+                 [luminus-nrepl "0.1.2"]
+                 [org.webjars/bootstrap "4.0.0-alpha.2"]
+                 [org.webjars/font-awesome "4.5.0"]
                  [org.webjars/jquery "2.1.4"]
-                 [com.taoensso/timbre "4.1.5-SNAPSHOT"]
+                 [org.clojure/tools.logging "0.3.1"]
+                 [org.slf4j/slf4j-log4j12 "1.7.13"]
+                 [org.apache.logging.log4j/log4j-core "2.5"]
                  [com.taoensso/tower "3.0.2"]
                  [compojure "1.4.0"]
                  [ring-webjars "0.1.1"]
@@ -33,7 +36,7 @@
                  [cljs-ajax "0.5.2"]
                  [metosin/compojure-api "0.24.2"]
                  [metosin/ring-swagger-ui "2.1.3-4"]
-                 [org.immutant/web "2.1.1"]]
+                 [luminus-immutant "0.1.0"]]
 
   :min-lein-version "2.0.0"
   :uberjar-name "picture-gallery.jar"
@@ -118,13 +121,11 @@
                   ;START:env
                   :env {:dev        true
                         :port       3000
-                        :nrepl-port 7000
-                        :log-level  :trace}
+                        :nrepl-port 7000}
                   ;END:env
                   }
    :project/test {:env {:test       true
                         :port       3001
-                        :nrepl-port 7001
-                        :log-level  :trace}}
+                        :nrepl-port 7001}}
    :profiles/dev {}
    :profiles/test {}})

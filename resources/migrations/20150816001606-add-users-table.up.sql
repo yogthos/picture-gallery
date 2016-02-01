@@ -6,4 +6,4 @@ CREATE TABLE users
  admin BOOLEAN,
  last_login TIME,
  is_active BOOLEAN,
- pass VARCHAR(162) NOT NULL);
+ pass VARCHAR(200) NOT NULL);
