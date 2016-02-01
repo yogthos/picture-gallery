@@ -34,7 +34,7 @@
 
 (def app-routes
   (routes
-    (var service-routes)
+   #'service-routes
    (wrap-routes #'restricted-service-routes middleware/wrap-auth)
     (wrap-routes #'home-routes middleware/wrap-csrf)
     (route/not-found
